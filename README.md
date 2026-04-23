@@ -34,9 +34,37 @@ python simple_test.py
 python local_test.py
 ```
 
-## 📖 详细文档
+## 📖 文档索引
 
-查看 [LOCAL_RUN.md](./LOCAL_RUN.md) 了解完整的使用说明和API文档。
+| 文档 | 说明 |
+|-----|------|
+| [README.md](./README.md) | 项目概览（本文档） |
+| [QUICKSTART.md](./QUICKSTART.md) | ⚡ 5分钟快速参考卡 |
+| [LOCAL_RUN.md](./LOCAL_RUN.md) | 📚 详细的本地运行指南 |
+| [DEPLOYMENT.md](./DEPLOYMENT.md) | 🛠️ 部署和API配置说明 |
+| [GITHUB_GUIDE.md](./GITHUB_GUIDE.md) | 📤 GitHub上传详细指南 |
+
+## ⚡ 5分钟快速开始
+
+### 1️⃣ 配置API
+```bash
+cp .env.example .env
+# 编辑 .env，填入你的COZE API密钥
+```
+
+### 2️⃣ 安装依赖
+```bash
+uv sync
+```
+
+### 3️⃣ 运行！
+```bash
+python simple_test.py  # 快速测试
+# 或
+python local_test.py   # 交互式对话
+```
+
+更多详细信息请查看 [QUICKSTART.md](./QUICKSTART.md)。
 
 ## 🎯 支持的学术领域
 
