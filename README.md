@@ -15,14 +15,16 @@
 ### 方法一：一键启动（推荐）
 
 ```bash
-cd /workspace/projects
+# 进入你克隆的项目目录
+cd ~/Documents/doubaoRagent  # 或你实际存放的路径
 ./start.sh
 ```
 
 ### 方法二：直接运行
 
 ```bash
-cd /workspace/projects
+# 进入你克隆的项目目录
+cd ~/Documents/doubaoRagent  # 或你实际存放的路径
 
 # 1. 安装依赖
 uv sync

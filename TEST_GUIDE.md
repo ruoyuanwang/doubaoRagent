@@ -19,12 +19,19 @@
 
 ### 1.1 创建 .env 文件
 
-在项目根目录下，复制环境变量模板：
+在项目根目录下（你克隆仓库的位置），复制环境变量模板：
 
 ```bash
-cd /workspace/projects
+# 进入你的项目目录（用你实际的路径，不是 /workspace/projects！）
+cd ~/Documents/doubaoRagent
+# 或者
+cd ~/Projects/doubaoRagent
+
+# 复制环境变量模板
 cp .env.example .env
 ```
+
+**重要说明**：不要用 `/workspace/projects`，那是开发环境路径！用你本地克隆仓库的实际路径。
 
 ### 1.2 编辑 .env 文件
 
@@ -68,7 +75,10 @@ __pycache__/
 ### 测试1：简单功能测试（推荐先试这个）
 
 ```bash
-cd /workspace/projects
+# 进入你的项目目录
+cd ~/Documents/doubaoRagent  # 或你实际的路径
+
+# 运行测试
 python simple_test.py
 ```
 
@@ -81,7 +91,10 @@ python simple_test.py
 ### 测试2：交互式对话测试
 
 ```bash
-cd /workspace/projects
+# 进入你的项目目录
+cd ~/Documents/doubaoRagent  # 或你实际的路径
+
+# 运行交互式对话
 python local_test.py
 ```
 
@@ -97,7 +110,11 @@ python local_test.py
 ### 测试3：一键启动菜单
 
 ```bash
-cd /workspace/projects
+# 进入你的项目目录
+cd ~/Documents/doubaoRagent  # 或你实际的路径
+
+# 运行一键启动脚本
+chmod +x start.sh  # 如果没有执行权限
 ./start.sh
 ```
 
