@@ -7,8 +7,21 @@ from langchain_openai import ChatOpenAI
 from langgraph.graph import MessagesState
 from langgraph.graph.message import add_messages
 from langchain_core.messages import AnyMessage
-from coze_coding_utils.runtime_ctx.context import default_headers
 from storage.memory.memory_saver import get_memory_saver
+
+# 优先使用本地兼容层，如果没有则尝试Coze内部工具
+try:
+    from local_compat import default_headers
+except ImportError:
+    try:
+        from coze_coding_utils.runtime_ctx.context import default_headers
+    except ImportError:
+        # 如果都没有，提供简单替代
+        def default_headers(ctx=None):
+            headers = {"User-Agent": "Academic-Report-Agent/1.0"}
+            if ctx:
+                headers["X-Client-Request-Id"] = "Coze,Integrations"
+            return headers
 
 # 导入工具
 from tools.academic_crawler_tool import search_academic_data, get_available_domains

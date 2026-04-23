@@ -11,7 +11,28 @@ project_root = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, project_root)
 sys.path.insert(0, os.path.join(project_root, 'src'))
 
-from coze_coding_utils.runtime_ctx.context import new_context
+# 首先尝试加载环境变量
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
+# 优先使用本地兼容层
+try:
+    from local_compat import new_context
+except ImportError:
+    # 如果本地兼容层不存在，尝试Coze内部工具
+    try:
+        from coze_coding_utils.runtime_ctx.context import new_context
+    except ImportError:
+        # 如果都没有，创建简单的替代
+        def new_context(method: str = "local", **kwargs):
+            class SimpleContext:
+                def __init__(self, method):
+                    self.method = method
+            return SimpleContext(method)
+
 from langchain_core.messages import HumanMessage
 
 def print_separator(title=""):
