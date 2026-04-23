@@ -1,4 +1,4 @@
-"""学术报告生成Agent"""
+"""学术报告生成Agent - 支持Coze和火山引擎双平台"""
 import os
 import json
 from typing import Annotated
@@ -38,6 +38,41 @@ def _windowed_messages(old, new):
 class AgentState(MessagesState):
     messages: Annotated[list[AnyMessage], _windowed_messages]
 
+def get_platform_config():
+    """获取平台配置"""
+    platform = os.getenv("PLATFORM", "coze").lower()
+    
+    if platform == "volcengine":
+        # 火山引擎豆包API配置
+        api_key = os.getenv("VOLCENGINE_API_KEY", "")
+        base_url = os.getenv("VOLCENGINE_BASE_URL", "https://ark.cn-beijing.volces.com/api/v3")
+        model = os.getenv("VOLCENGINE_MODEL_ID", "")
+        
+        if not api_key or not model:
+            raise ValueError(
+                "火山引擎配置不完整！请检查 .env 文件中的：\n"
+                "  - VOLCENGINE_API_KEY\n"
+                "  - VOLCENGINE_MODEL_ID\n"
+                "  - VOLCENGINE_BASE_URL (可选)"
+            )
+        
+        return {
+            "platform": "volcengine",
+            "api_key": api_key,
+            "base_url": base_url,
+            "model": model
+        }
+    else:
+        # Coze平台配置（默认）
+        api_key = os.getenv("COZE_WORKLOAD_IDENTITY_API_KEY", "")
+        base_url = os.getenv("COZE_INTEGRATION_MODEL_BASE_URL", "https://api.coze.cn")
+        
+        return {
+            "platform": "coze",
+            "api_key": api_key,
+            "base_url": base_url
+        }
+
 def build_agent(ctx=None):
     workspace_path = os.getenv("COZE_WORKSPACE_PATH", "/workspace/projects")
     config_path = os.path.join(workspace_path, LLM_CONFIG)
@@ -45,23 +80,47 @@ def build_agent(ctx=None):
     with open(config_path, 'r', encoding='utf-8') as f:
         cfg = json.load(f)
 
-    api_key = os.getenv("COZE_WORKLOAD_IDENTITY_API_KEY")
-    base_url = os.getenv("COZE_INTEGRATION_MODEL_BASE_URL")
+    # 获取平台配置
+    platform_config = get_platform_config()
+    
+    # 从配置文件读取或从环境变量覆盖
+    temperature = float(os.getenv("TEMPERATURE", cfg['config'].get('temperature', 0.7)))
+    max_tokens = int(os.getenv("MAX_COMPLETION_TOKENS", cfg['config'].get('max_completion_tokens', 32768)))
+    timeout = cfg['config'].get('timeout', 600)
+    thinking = cfg['config'].get('thinking', 'disabled')
 
-    llm = ChatOpenAI(
-        model=cfg['config'].get("model"),
-        api_key=api_key,
-        base_url=base_url,
-        temperature=cfg['config'].get('temperature', 0.7),
-        streaming=True,
-        timeout=cfg['config'].get('timeout', 600),
-        extra_body={
+    # 根据平台选择模型
+    if platform_config['platform'] == 'volcengine':
+        model = platform_config['model']
+        print(f"🗻 使用火山引擎豆包API - 模型: {model}")
+    else:
+        model = cfg['config'].get("model", "doubao-seed-1-8-251228")
+        print(f"🔷 使用Coze平台 - 模型: {model}")
+
+    # 构建LLM配置
+    llm_kwargs = {
+        "model": model,
+        "api_key": platform_config['api_key'],
+        "base_url": platform_config['base_url'],
+        "temperature": temperature,
+        "streaming": True,
+        "timeout": timeout,
+        "extra_body": {
             "thinking": {
-                "type": cfg['config'].get('thinking', 'disabled')
+                "type": thinking
             }
-        },
-        default_headers=default_headers(ctx) if ctx else {}
-    )
+        }
+    }
+
+    # 火山引擎需要特殊的header
+    if platform_config['platform'] == 'volcengine':
+        llm_kwargs["default_headers"] = {
+            "X-Client-Request-Id": "Coze,Integrations",
+        }
+    else:
+        llm_kwargs["default_headers"] = default_headers(ctx) if ctx else {}
+
+    llm = ChatOpenAI(**llm_kwargs)
 
     # 工具列表
     tools = [
