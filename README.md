@@ -39,6 +39,7 @@ python local_test.py
 | 文档 | 说明 |
 |-----|------|
 | [README.md](./README.md) | 项目概览（本文档） |
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | 🏗️ **项目架构详解（必读！）** |
 | [MODEL_GUIDE.md](./MODEL_GUIDE.md) | 🤖 模型配置和API设置指南 |
 | [QUICKSTART.md](./QUICKSTART.md) | ⚡ 5分钟快速参考卡 |
 | [LOCAL_RUN.md](./LOCAL_RUN.md) | 📚 详细的本地运行指南 |
